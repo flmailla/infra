@@ -1,0 +1,37 @@
+---
+- name: Create application group
+  group:
+    name: "{{ app_group }}"
+    state: present
+
+- name: Create application user
+  user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    system: yes
+    shell: /bin/bash
+    home: "/home/{{ app_user }}"
+    create_home: yes
+    state: present
+
+- name: Create .ssh directory for app user
+  file:
+    path: "/home/{{ app_user }}/.ssh"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0700"
+
+- name: Add SSH public key to authorized_keys
+  authorized_key:
+    user: "{{ app_user }}"
+    key: "{{ ssh_public_key }}"
+    state: present
+
+- name: Create application directory
+  file:
+    path: "/opt/{{ go_app_name }}/bin"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0755"

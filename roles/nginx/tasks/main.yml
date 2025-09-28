@@ -1,0 +1,36 @@
+---
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Remove default Nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+
+- name: Create Nginx configuration for Go app
+  template:
+    src: goapp.conf.j2
+    dest: "/etc/nginx/sites-available/{{ domain_name }}"
+    backup: yes
+  notify: restart nginx
+
+- name: Enable site
+  file:
+    src: "/etc/nginx/sites-available/{{ domain_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ domain_name }}"
+    state: link
+  notify: restart nginx
+
+- name: Test Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Start and enable Nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes

@@ -1,0 +1,9 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart goapp
+  service:
+    name: "{{ go_app_service_name }}"
+    state: restarted

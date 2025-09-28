@@ -1,0 +1,16 @@
+---
+- name: Deploy Go app with Nginx and SSL
+  hosts: web
+  become: yes
+  vars:
+    app_user: "deploy"
+    app_port: "8090"
+    domain_name: "{{ ansible_fqdn | default('maillard.icu') }}"
+    go_app_service_name: "main"
+
+  roles:
+    - common
+    - users
+    - nginx
+    - letsencrypt
+    - goapp-proxy

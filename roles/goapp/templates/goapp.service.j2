@@ -1,0 +1,16 @@
+[Unit]
+Description=Go Application
+After=network.target
+
+[Service]
+Type=simple
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory=/opt/{{ go_app_name }}/bin
+ExecStart=/opt/{{ go_app_name }}/bin/{{ go_binary_name }}
+Restart=always
+RestartSec=10
+Environment=PORT={{ app_port }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,44 @@
+---
+- name: Install snapd
+  package:
+    name: snapd
+    state: present
+
+- name: Install certbot via snap
+  snap:
+    name: certbot
+    classic: yes
+
+- name: Create symlink for certbot
+  file:
+    src: /snap/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
+
+- name: Obtain SSL certificate
+  command: >
+    certbot certonly --webroot
+    --webroot-path=/var/www/html
+    --email {{ email }}
+    --agree-tos
+    --no-eff-email
+    -d {{ domain_name }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+
+- name: Update Nginx configuration with SSL
+  template:
+    src: goapp-ssl.conf.j2
+    dest: "/etc/nginx/sites-available/{{ domain_name }}"
+    backup: yes
+  notify: reload nginx
+
+- name: Set up automatic renewal
+  cron:
+    name: "Certbot automatic renewal"
+    job: "/usr/bin/certbot renew --quiet && systemctl reload nginx"
+    minute: "0"
+    hour: "12"
+    day: "*"
+    month: "*"
+    weekday: "*"
