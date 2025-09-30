@@ -8,10 +8,13 @@
     domain_name: "{{ ansible_fqdn | default('maillard.icu') }}"
     go_app_service_name: "main"
   vars_files:
-    - vars/all.yml
+    - dev/group_vars/go.yml
   roles:
     - common
     - users
     - nginx
     - letsencrypt
     - goapp
+    - apim
+    - apim-control-plane
+    - apim-gateway
