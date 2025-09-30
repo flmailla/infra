@@ -10,9 +10,16 @@
     state: absent
   notify: restart nginx
 
+- name: Update nginx conf
+  template:
+    src: "../templates/nginx.conf"
+    dest: "/etc/nginx/nginx.conf"
+    backup: yes
+  notify: restart nginx
+
 - name: Create Nginx configuration for Go app
   template:
-    src: goapp.conf.j2
+    src: "../goapp.conf.j2"
     dest: "/etc/nginx/sites-available/{{ domain_name }}"
     backup: yes
   notify: restart nginx
